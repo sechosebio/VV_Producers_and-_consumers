@@ -1,0 +1,10 @@
+#genera fichero c con regla de logica temporal
+spin -a -f '<>(Producer@cs && Consumer@cs)' producers_consumers.pml
+#compila fichero c
+gcc -o pan pan.c
+#ejecutas y ves que aparece errors = 1
+./pan
+
+#ejecutas spin con función -t para que coja el fichero .trail con el escenario
+#donde hay error, y te muestra todos los pasos con la función -p
+spin -t -p producers_consumers.pml
