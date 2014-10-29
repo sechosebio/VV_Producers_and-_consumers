@@ -26,22 +26,24 @@ settable(void)
 
 	/* proctype 2: never_0 */
 
-	trans[2] = (Trans **) emalloc(11*sizeof(Trans *));
+	trans[2] = (Trans **) emalloc(14*sizeof(Trans *));
 
-	trans[2][7]	= settr(22,0,6,1,0,".(goto)", 0, 2, 0);
-	T = trans[2][6] = settr(21,0,0,0,0,"DO", 0, 2, 0);
-	T = T->nxt	= settr(21,0,3,0,0,"DO", 0, 2, 0);
-	    T->nxt	= settr(21,0,4,0,0,"DO", 0, 2, 0);
-	T = trans[ 2][3] = settr(18,2,0,0,0,"ATOMIC", 1, 2, 0);
-	T->nxt	= settr(18,2,1,0,0,"ATOMIC", 1, 2, 0);
-	trans[2][1]	= settr(16,0,6,3,3,"(((Producer._p==cs)&&(Consumer._p==cs)))", 1, 2, 0); /* m: 2 -> 6,0 */
-	reached2[2] = 1;
-	trans[2][2]	= settr(0,0,0,0,0,"assert(!(((Producer._p==cs)&&(Consumer._p==cs))))",0,0,0);
-	trans[2][4]	= settr(19,0,6,1,0,"(1)", 0, 2, 0);
-	trans[2][5]	= settr(20,0,6,1,0,"goto T0_init", 0, 2, 0);
-	trans[2][8]	= settr(23,0,9,1,0,"break", 0, 2, 0);
-	trans[2][9]	= settr(24,0,10,1,0,"(1)", 0, 2, 0);
-	trans[2][10]	= settr(25,0,0,4,4,"-end-", 0, 3500, 0);
+	trans[2][6]	= settr(21,0,5,1,0,".(goto)", 0, 2, 0);
+	T = trans[2][5] = settr(20,0,0,0,0,"DO", 0, 2, 0);
+	T = T->nxt	= settr(20,0,1,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(20,0,3,0,0,"DO", 0, 2, 0);
+	trans[2][1]	= settr(16,0,10,3,0,"(!((Producer._p==cs)))", 1, 2, 0);
+	trans[2][2]	= settr(17,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[2][3]	= settr(18,0,5,1,0,"(1)", 0, 2, 0);
+	trans[2][4]	= settr(19,0,5,1,0,"goto T0_init", 0, 2, 0);
+	trans[2][7]	= settr(22,0,10,1,0,"break", 0, 2, 0);
+	trans[2][11]	= settr(26,0,10,1,0,".(goto)", 0, 2, 0);
+	T = trans[2][10] = settr(25,0,0,0,0,"DO", 0, 2, 0);
+	    T->nxt	= settr(25,0,8,0,0,"DO", 0, 2, 0);
+	trans[2][8]	= settr(23,0,10,4,0,"(!((Producer._p==cs)))", 1, 2, 0);
+	trans[2][9]	= settr(24,0,10,1,0,"goto accept_S4", 0, 2, 0);
+	trans[2][12]	= settr(27,0,13,1,0,"break", 0, 2, 0);
+	trans[2][13]	= settr(28,0,0,5,5,"-end-", 0, 3500, 0);
 
 	/* proctype 1: Consumer */
 
@@ -50,12 +52,12 @@ settable(void)
 	trans[1][6]	= settr(13,0,5,1,0,".(goto)", 0, 2, 0);
 	T = trans[1][5] = settr(12,0,0,0,0,"DO", 0, 2, 0);
 	    T->nxt	= settr(12,0,1,0,0,"DO", 0, 2, 0);
-	trans[1][1]	= settr(8,0,2,5,0,"((items>0))", 1, 2, 0);
-	trans[1][2]	= settr(9,0,3,6,0,"printf('Extraído elemento del buffer\\n')", 1, 2, 0);
-	trans[1][3]	= settr(10,0,4,7,7,"items = (items-1)", 1, 2, 0);
-	trans[1][4]	= settr(11,0,5,8,0,"printf('%d Elementos en buffer\\n\\n',items)", 1, 2, 0);
+	trans[1][1]	= settr(8,0,2,6,0,"((items>0))", 1, 2, 0);
+	trans[1][2]	= settr(9,0,3,7,0,"printf('Extraído elemento del buffer\\n')", 0, 2, 0);
+	trans[1][3]	= settr(10,0,4,8,0,"printf('%d Elementos en buffer\\n\\n',items)", 1, 2, 0);
+	trans[1][4]	= settr(11,0,5,9,9,"items = (items-1)", 1, 2, 0);
 	trans[1][7]	= settr(14,0,8,1,0,"break", 0, 2, 0);
-	trans[1][8]	= settr(15,0,0,9,9,"-end-", 0, 3500, 0);
+	trans[1][8]	= settr(15,0,0,10,10,"-end-", 0, 3500, 0);
 
 	/* proctype 0: Producer */
 
@@ -64,12 +66,12 @@ settable(void)
 	trans[0][6]	= settr(5,0,5,1,0,".(goto)", 0, 2, 0);
 	T = trans[0][5] = settr(4,0,0,0,0,"DO", 0, 2, 0);
 	    T->nxt	= settr(4,0,1,0,0,"DO", 0, 2, 0);
-	trans[0][1]	= settr(0,0,2,10,0,"((items<255))", 1, 2, 0);
-	trans[0][2]	= settr(1,0,3,11,0,"printf('Produce nuevo elemento\\n')", 1, 2, 0);
-	trans[0][3]	= settr(2,0,4,12,12,"items = (items+1)", 1, 2, 0);
-	trans[0][4]	= settr(3,0,5,13,0,"printf('%d Elementos en buffer\\n\\n',items)", 1, 2, 0);
+	trans[0][1]	= settr(0,0,2,11,0,"((items<255))", 1, 2, 0);
+	trans[0][2]	= settr(1,0,3,12,0,"printf('Produce nuevo elemento\\n')", 1, 2, 0);
+	trans[0][3]	= settr(2,0,4,13,0,"printf('%d Elementos en buffer\\n\\n',items)", 1, 2, 0);
+	trans[0][4]	= settr(3,0,5,14,14,"items = (items+1)", 1, 2, 0);
 	trans[0][7]	= settr(6,0,8,1,0,"break", 0, 2, 0);
-	trans[0][8]	= settr(7,0,0,14,14,"-end-", 0, 3500, 0);
+	trans[0][8]	= settr(7,0,0,15,15,"-end-", 0, 3500, 0);
 	/* np_ demon: */
 	trans[_NP_] = (Trans **) emalloc(2*sizeof(Trans *));
 	T = trans[_NP_][0] = settr(9997,0,1,_T5,0,"(np_)", 1,2,0);

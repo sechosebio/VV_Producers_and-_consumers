@@ -4,11 +4,11 @@
 
 		 /* CLAIM never_0 */
 ;
+		;
+		;
+		;
 		
-	case 3: // STATE 1
-		goto R999;
-
-	case 4: // STATE 10
+	case 5: // STATE 13
 		;
 		p_restor(II);
 		;
@@ -20,16 +20,16 @@
 		;
 		;
 		;
+		;
+		;
 		
-	case 7: // STATE 3
+	case 9: // STATE 4
 		;
 		now.items = trpt->bup.oval;
 		;
 		goto R999;
-;
-		;
-		
-	case 9: // STATE 8
+
+	case 10: // STATE 8
 		;
 		p_restor(II);
 		;
@@ -41,16 +41,16 @@
 		;
 		;
 		;
+		;
+		;
 		
-	case 12: // STATE 3
+	case 14: // STATE 4
 		;
 		now.items = trpt->bup.oval;
 		;
 		goto R999;
-;
-		;
-		
-	case 14: // STATE 8
+
+	case 15: // STATE 8
 		;
 		p_restor(II);
 		;

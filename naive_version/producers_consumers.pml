@@ -6,22 +6,22 @@ The first solution is a naive protocol where we keep one shared variable items w
 
 byte items = 0;
 
-active proctype Producer(){
+active [2] proctype Producer(){
 	do
 	::	items < N;
 		printf("Produce nuevo elemento\n");
-		cs:items++;
-		printf("%d Elementos en buffer\n\n",items);
+		cs:printf("%d Elementos en buffer\n\n",items);
+		items++;
 		
 	od;
 }
 
-active [4] proctype Consumer(){
+active [1] proctype Consumer(){
 	do
 	::	 
 		items > 0;
 		printf("Extraído elemento del buffer\n");
-		cs:items--;
-		printf("%d Elementos en buffer\n\n",items);
+		cs:printf("%d Elementos en buffer\n\n",items);
+		items--;
 	od;
 }

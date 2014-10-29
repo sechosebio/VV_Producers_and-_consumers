@@ -411,17 +411,17 @@ int _;	/* predefined write-only variable */
 #endif
 
 short src_ln2 [] = {
-	  0,   5,   5,   5,   6,   6,   4,   8, 
-	  4,   9,  10,   0, };
+	  0,   5,   5,   6,   6,   4,   8,   4, 
+	 10,  10,   9,  12,   9,  12,   0, };
 S_F_MAP src_file2 [] = {
 	{ "-", 0, 0 },
-	{ "producers_consumers.pml.nvr", 1, 10 },
-	{ "-", 11, 12 }
+	{ "producers_consumers.pml.nvr", 1, 13 },
+	{ "-", 14, 15 }
 };
 short *src_claim;
 uchar reached2 [] = {
-	  0,   1,   0,   1,   1,   1,   0,   1, 
-	  1,   1,   0,   0, };
+	  0,   1,   1,   1,   1,   0,   1,   1, 
+	  1,   1,   0,   1,   1,   0,   0, };
 uchar *loopstate2;
 
 short src_ln1 [] = {
@@ -760,11 +760,11 @@ addproc(int calling_pid, int priority, int n)
 		break;
 	case 2:	/* never_0 */
 		((P2 *)pptr(h))->_t = 2;
-		((P2 *)pptr(h))->_p = 6;
+		((P2 *)pptr(h))->_p = 5;
 #ifdef HAS_PRIORITY
 		((P2 *)pptr(h))->_priority = priority; /* was: 1 */
 #endif
-		reached2[6]=1;
+		reached2[5]=1;
 		src_claim = src_ln2;
 		/* params: */
 		/* locals: */
@@ -921,8 +921,7 @@ run(void)
 	if ((Maxbody % WS) != 0)
 		Maxbody += WS - (Maxbody % WS);
 
-	accpstate[2][9] = 1;
-	visstate[1][3] = 1;
+	accpstate[2][10] = 1;
 	visstate[0][3] = 1;
 	retrans(0, nstates0, start0, src_ln0, reached0, loopstate0);
 	retrans(1, nstates1, start1, src_ln1, reached1, loopstate1);
@@ -12206,15 +12205,11 @@ active_procs(void)
 {
 	if (!permuted) {
 		Addproc(0, 1);
-		Addproc(1, 1);
-		Addproc(1, 1);
-		Addproc(1, 1);
+		Addproc(0, 1);
 		Addproc(1, 1);
 	} else {
 		Addproc(1, 1);
-		Addproc(1, 1);
-		Addproc(1, 1);
-		Addproc(1, 1);
+		Addproc(0, 1);
 		Addproc(0, 1);
 	}
 }
@@ -13359,7 +13354,7 @@ c_chandump(int unused)
 {	unused++; /* avoid complaints */
 }
 
-Trans *t_id_lkup[26];
+Trans *t_id_lkup[29];
 
 
 #ifdef BFS_PAR

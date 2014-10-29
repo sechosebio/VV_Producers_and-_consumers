@@ -102,7 +102,7 @@
 #ifndef NFAIR
 	#define NFAIR	2	/* must be >= 2 */
 #endif
-#define REM_REFS	4
+#define REM_REFS	2
 #define HAS_CODE	1
 #if defined(RANDSTORE) && !defined(RANDSTOR)
 	#define RANDSTOR	RANDSTORE
@@ -136,10 +136,10 @@ typedef struct S_F_MAP {
 	int upto;
 } S_F_MAP;
 
-#define nstates2	11	/* never_0 */
+#define nstates2	14	/* never_0 */
 #define minseq2	16
-#define maxseq2	25
-#define endstate2	10
+#define maxseq2	28
+#define endstate2	13
 
 #define nstates1	9	/* Consumer */
 #define minseq1	8
@@ -159,8 +159,8 @@ extern S_F_MAP src_file1[];
 extern S_F_MAP src_file0[];
 
 #define T_ID	unsigned char
-#define _T5	15
-#define _T2	16
+#define _T5	16
+#define _T2	17
 #define WS		8 /* word size in bytes */
 #define SYNC	0
 #define ASYNC	0
@@ -437,7 +437,7 @@ typedef struct TRIX_v6 {
 #define endstate3	2 /* np_ */
 
 #define start3	0 /* np_ */
-#define start2	6
+#define start2	5
 #define start1	5
 #define start0	5
 #ifdef NP
@@ -785,7 +785,7 @@ void qsend(int, int, int);
 #define GLOBAL	7
 #define BAD	8
 #define ALPHA_F	9
-#define NTRANS	17
+#define NTRANS	18
 #if defined(BFS_PAR) || NCORE>1
 	void e_critical(int);
 	void x_critical(int);

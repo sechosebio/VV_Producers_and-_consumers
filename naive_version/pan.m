@@ -20,7 +20,7 @@
 		_m = 3; goto P999;
 
 		 /* CLAIM never_0 */
-	case 3: // STATE 1 - producers_consumers.pml.nvr:5 - [(((Producer._p==cs)&&(Consumer._p==cs)))] (6:0:0 - 1)
+	case 3: // STATE 1 - producers_consumers.pml.nvr:5 - [(!((Producer._p==cs)))] (0:0:0 - 1)
 		
 #if defined(VERI) && !defined(NP)
 #if NCLAIMS>1
@@ -43,56 +43,81 @@
 #endif
 #endif
 		reached[2][1] = 1;
-		if (!(((((int)((P0 *)Pptr(f_pid(0)))->_p)==3)&&(((int)((P1 *)Pptr(f_pid(1)))->_p)==3))))
+		if (!( !((((int)((P0 *)Pptr(f_pid(0)))->_p)==3))))
 			continue;
-		/* merge: assert(!(((Producer._p==cs)&&(Consumer._p==cs))))(0, 2, 6) */
-		reached[2][2] = 1;
-		spin_assert( !(((((int)((P0 *)Pptr(f_pid(0)))->_p)==3)&&(((int)((P1 *)Pptr(f_pid(1)))->_p)==3))), " !(((Producer._p==cs)&&(Consumer._p==cs)))", II, tt, t);
-		/* merge: .(goto)(0, 7, 6) */
-		reached[2][7] = 1;
-		;
-		_m = 3; goto P999; /* 2 */
-	case 4: // STATE 10 - producers_consumers.pml.nvr:10 - [-end-] (0:0:0 - 1)
+		_m = 3; goto P999; /* 0 */
+	case 4: // STATE 8 - producers_consumers.pml.nvr:10 - [(!((Producer._p==cs)))] (0:0:0 - 1)
 		
 #if defined(VERI) && !defined(NP)
 #if NCLAIMS>1
-		{	static int reported10 = 0;
-			if (verbose && !reported10)
+		{	static int reported8 = 0;
+			if (verbose && !reported8)
 			{	int nn = (int) ((Pclaim *)pptr(0))->_n;
 				printf("depth %ld: Claim %s (%d), state %d (line %d)\n",
 					depth, procname[spin_c_typ[nn]], nn, (int) ((Pclaim *)pptr(0))->_p, src_claim[ (int) ((Pclaim *)pptr(0))->_p ]);
-				reported10 = 1;
+				reported8 = 1;
 				fflush(stdout);
 		}	}
 #else
-		{	static int reported10 = 0;
-			if (verbose && !reported10)
+		{	static int reported8 = 0;
+			if (verbose && !reported8)
 			{	printf("depth %d: Claim, state %d (line %d)\n",
 					(int) depth, (int) ((Pclaim *)pptr(0))->_p, src_claim[ (int) ((Pclaim *)pptr(0))->_p ]);
-				reported10 = 1;
+				reported8 = 1;
 				fflush(stdout);
 		}	}
 #endif
 #endif
-		reached[2][10] = 1;
+		reached[2][8] = 1;
+		if (!( !((((int)((P0 *)Pptr(f_pid(0)))->_p)==3))))
+			continue;
+		_m = 3; goto P999; /* 0 */
+	case 5: // STATE 13 - producers_consumers.pml.nvr:12 - [-end-] (0:0:0 - 1)
+		
+#if defined(VERI) && !defined(NP)
+#if NCLAIMS>1
+		{	static int reported13 = 0;
+			if (verbose && !reported13)
+			{	int nn = (int) ((Pclaim *)pptr(0))->_n;
+				printf("depth %ld: Claim %s (%d), state %d (line %d)\n",
+					depth, procname[spin_c_typ[nn]], nn, (int) ((Pclaim *)pptr(0))->_p, src_claim[ (int) ((Pclaim *)pptr(0))->_p ]);
+				reported13 = 1;
+				fflush(stdout);
+		}	}
+#else
+		{	static int reported13 = 0;
+			if (verbose && !reported13)
+			{	printf("depth %d: Claim, state %d (line %d)\n",
+					(int) depth, (int) ((Pclaim *)pptr(0))->_p, src_claim[ (int) ((Pclaim *)pptr(0))->_p ]);
+				reported13 = 1;
+				fflush(stdout);
+		}	}
+#endif
+#endif
+		reached[2][13] = 1;
 		if (!delproc(1, II)) continue;
 		_m = 3; goto P999; /* 0 */
 
 		 /* PROC Consumer */
-	case 5: // STATE 1 - ./producers_consumers.pml:22 - [((items>0))] (0:0:0 - 1)
+	case 6: // STATE 1 - ./producers_consumers.pml:22 - [((items>0))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[1][1] = 1;
 		if (!((((int)now.items)>0)))
 			continue;
 		_m = 3; goto P999; /* 0 */
-	case 6: // STATE 2 - ./producers_consumers.pml:23 - [printf('Extraído elemento del buffer\\n')] (0:0:0 - 1)
+	case 7: // STATE 2 - ./producers_consumers.pml:23 - [printf('Extraído elemento del buffer\\n')] (0:0:0 - 1)
 		IfNotBlocked
 		reached[1][2] = 1;
 		Printf("Extraído elemento del buffer\n");
 		_m = 3; goto P999; /* 0 */
-	case 7: // STATE 3 - ./producers_consumers.pml:24 - [items = (items-1)] (0:0:1 - 1)
+	case 8: // STATE 3 - ./producers_consumers.pml:24 - [printf('%d Elementos en buffer\\n\\n',items)] (0:0:0 - 1)
 		IfNotBlocked
 		reached[1][3] = 1;
+		Printf("%d Elementos en buffer\n\n", ((int)now.items));
+		_m = 3; goto P999; /* 0 */
+	case 9: // STATE 4 - ./producers_consumers.pml:25 - [items = (items-1)] (0:0:1 - 1)
+		IfNotBlocked
+		reached[1][4] = 1;
 		(trpt+1)->bup.oval = ((int)now.items);
 		now.items = (((int)now.items)-1);
 #ifdef VAR_RANGES
@@ -100,32 +125,32 @@
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 8: // STATE 4 - ./producers_consumers.pml:25 - [printf('%d Elementos en buffer\\n\\n',items)] (0:0:0 - 1)
-		IfNotBlocked
-		reached[1][4] = 1;
-		Printf("%d Elementos en buffer\n\n", ((int)now.items));
-		_m = 3; goto P999; /* 0 */
-	case 9: // STATE 8 - ./producers_consumers.pml:27 - [-end-] (0:0:0 - 1)
+	case 10: // STATE 8 - ./producers_consumers.pml:27 - [-end-] (0:0:0 - 1)
 		IfNotBlocked
 		reached[1][8] = 1;
 		if (!delproc(1, II)) continue;
 		_m = 3; goto P999; /* 0 */
 
 		 /* PROC Producer */
-	case 10: // STATE 1 - ./producers_consumers.pml:11 - [((items<255))] (0:0:0 - 1)
+	case 11: // STATE 1 - ./producers_consumers.pml:11 - [((items<255))] (0:0:0 - 1)
 		IfNotBlocked
 		reached[0][1] = 1;
 		if (!((((int)now.items)<255)))
 			continue;
 		_m = 3; goto P999; /* 0 */
-	case 11: // STATE 2 - ./producers_consumers.pml:12 - [printf('Produce nuevo elemento\\n')] (0:0:0 - 1)
+	case 12: // STATE 2 - ./producers_consumers.pml:12 - [printf('Produce nuevo elemento\\n')] (0:0:0 - 1)
 		IfNotBlocked
 		reached[0][2] = 1;
 		Printf("Produce nuevo elemento\n");
 		_m = 3; goto P999; /* 0 */
-	case 12: // STATE 3 - ./producers_consumers.pml:13 - [items = (items+1)] (0:0:1 - 1)
+	case 13: // STATE 3 - ./producers_consumers.pml:13 - [printf('%d Elementos en buffer\\n\\n',items)] (0:0:0 - 1)
 		IfNotBlocked
 		reached[0][3] = 1;
+		Printf("%d Elementos en buffer\n\n", ((int)now.items));
+		_m = 3; goto P999; /* 0 */
+	case 14: // STATE 4 - ./producers_consumers.pml:14 - [items = (items+1)] (0:0:1 - 1)
+		IfNotBlocked
+		reached[0][4] = 1;
 		(trpt+1)->bup.oval = ((int)now.items);
 		now.items = (((int)now.items)+1);
 #ifdef VAR_RANGES
@@ -133,12 +158,7 @@
 #endif
 		;
 		_m = 3; goto P999; /* 0 */
-	case 13: // STATE 4 - ./producers_consumers.pml:14 - [printf('%d Elementos en buffer\\n\\n',items)] (0:0:0 - 1)
-		IfNotBlocked
-		reached[0][4] = 1;
-		Printf("%d Elementos en buffer\n\n", ((int)now.items));
-		_m = 3; goto P999; /* 0 */
-	case 14: // STATE 8 - ./producers_consumers.pml:17 - [-end-] (0:0:0 - 1)
+	case 15: // STATE 8 - ./producers_consumers.pml:17 - [-end-] (0:0:0 - 1)
 		IfNotBlocked
 		reached[0][8] = 1;
 		if (!delproc(1, II)) continue;
