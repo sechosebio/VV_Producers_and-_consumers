@@ -11,8 +11,11 @@ spin -t -p producers_consumers.pml
 
 
 
+#PARA HACER EN LATEX
+
 #Para hacerlo con numero de proceso
 spin -a -f '<>(Consumer[0]@cs && Consumer[1]@cs)' producers_consumers.pml
+#
 #esto detecta si se incumple mutual exclusion
 #para tamaño de buffer 0 , no existe mutual exclusion, puesto que ninguno crea ni consume nada, no entran en zona crítica
 #para consumer = 1 y producer = 0 o viceversa, tampoco, solo hay un proceso corriendo al mismo tiempo
