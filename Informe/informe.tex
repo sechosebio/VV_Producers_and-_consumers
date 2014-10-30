@@ -1,0 +1,114 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amssymb} 
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{cprotect}
+
+
+\makeindex
+\begin{document}
+
+
+\vspace{2cm}
+\includegraphics[scale=0.75]{logo_fic_185.png}\hspace{5cm} 
+\includegraphics[scale=0.35]{logo-udc.jpg}\\
+[2cm]
+\begin{center}
+  \Large \textbf{Producers and consumers}\\ VV: Exercise 2, model checking
+\end{center}
+
+
+\vspace{10cm}
+\begin{flushright}
+Denís Graña Fernández \\
+José Antonio López Sebio \\
+[2cm]
+\end{flushright}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introducción}
+
+
+\section{Algoritmo naive}
+
+\lstset{
+	language=C,
+	tabsize=2,  
+	showspaces=false,     
+	breakatwhitespace=false,
+	showstringspaces=false
+	}          % Set your language (you can change the language for each code-block optionally)
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+#define N 255
+byte items = 0;
+
+active [2] proctype Producer(){
+	do
+	::	items < N;
+		printf("Produce nuevo elemento\n");
+		cs:printf("%d Elementos en buffer\n\n",items);
+		items++;
+		
+	od;
+}
+
+active [1] proctype Consumer(){
+	do
+	::	 
+		items > 0;
+		printf("Extraido elemento del buffer\n");
+		cs:printf("%d Elementos en buffer\n\n",items);
+		assert(items>0);
+		items--;
+	od;
+}
+\end{lstlisting}
+
+\subsection{Mutual exclusion}
+Para probar la existencia de \textit{mutual exclusion} en el agoritmo \textit{naive}, utilizamos la siguiente fórmula LTL
+
+\begin{lstlisting}
+spin -a -f '<>(Consumer[0]@cs && Consumer[1]@cs)' 
+producers_consumers.pml
+\end{lstlisting}
+
+En caso de realizar la misma prueba con 1 \textit{consumer} y 0 \textit{producer}, o viceversa, no existe \textit{mutual exclusion} ya que sólo hay un proceso corriendo al mismo tiempo.
+
+Para tamaño de buffer=0 queda demostrado que no existe \textit{mutual exclusion} puesto que ningún proceso produce, ni consume nada, ya que no entran en zona crítica.
+
+\subsection{Deadlock}
+
+\begin{lstlisting}
+spin -a producers_consumers.pml
+gcc -o pan pan.c 
+./pan
+\end{lstlisting}
+
+\subsection{Starvation}
+
+Para la detección de \textit{starvation} fue usada la siguiente fórmula LTE: 
+
+\begin{lstlisting}
+spin -a -f '![]<>(Producer@cs
+)' producers_consumers.pml
+gcc -o pan pan.c
+./pan -a
+\end{lstlisting}
+
+Dónde comprobamos que:
+
+\begin{itemize}
+\item Con N=0, sí encuentra \textit{starvation}.
+\item \textit{producer}=\textit{consumer}=1 no encuentra, puesto que se turnan para producir/consumir.
+\item \textit{producer}\textgreater 1 o \textit{consumer}\textgreater 1 sí hay \textit{starvation}.
+\end{itemize}
+
+\end{document}          
