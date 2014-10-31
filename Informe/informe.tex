@@ -111,4 +111,253 @@ Dónde comprobamos que:
 \item \textit{producer}\textgreater 1 o \textit{consumer}\textgreater 1 sí hay \textit{starvation}.
 \end{itemize}
 
+\newpage
+\section{Algoritmo con Semáforos}
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+#define N 255
+byte holes = N;
+byte items = 0;
+bool mutex = false;
+
+active [2] proctype Producer(){
+        do
+        ::
+                printf("Produce nuevo item\n");
+                /* wait holes */
+                atomic{
+                        holes;
+                        items<N;
+                        holes--;
+                };
+                /* wait mutex */
+                atomic{
+                        !mutex;
+                        mutex = true;
+                };
+                cs:printf("Escribe en el buffer\n");
+                /* signal mutex */
+                mutex = false;
+                /* signal items */
+                items++;
+
+        od;
+}
+
+active [2] proctype Consumer(){
+        do
+        ::
+                /* lock items */
+                atomic{
+                        items;
+                        holes<N;
+                        items--;
+                };
+                /* lock mutex */
+                atomic{
+                        !mutex;
+                        mutex = true;
+                };
+                cs:printf("Extrae elemento del buffer\n");
+                /* signal mutex */
+                mutex = false;
+                /*signal holes */
+                holes++;
+                printf("Consume elemento\n");
+        od;
+}
+\end{lstlisting}
+
+\subsection{Mutual exclusion}
+
+\subsubsection{Producer, Consumer $>=$ 1}
+Para probar la existencia de \textit{mutual exclusion} en el agoritmo \textit{con semáforos}, utilizamos la siguiente fórmula LTL en el caso general, con varios procesos
+
+\begin{lstlisting}
+spin -a -f '<>(Producer[0]@cs && Consumer[2]@cs)' producers_consumers.pml
+gcc -o pan pan.c -DSAFETY
+./pan
+\end{lstlisting}
+con la siguiente salida:
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+...
+State-vector 52 byte, depth reached 9999, errors: 0
+    27724 states, stored
+    43247 states, matched
+    70971 transitions (= stored+matched)
+    16566 atomic steps
+hash conflicts:        11 (resolved)
+...
+\end{lstlisting}
+\textbf{No se encuentran errores, podemos asegurar que no hay mutual exclusion}
+Nota: Cuando se hacia p(mutex) sin ser de forma atómica, si que había exclusión mútua
+
+\subsubsection{Un solo proceso}
+Cambiamos el código a active [0] proctype y active [1] proctype respectivamente
+\begin{lstlisting}
+spin -a -f '<>(Producer@cs && Consumer@cs)' producers_consumers.pml
+gcc -o pan pan.c -DSAFETY
+./pan
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+...
+State-vector 28 byte, depth reached 3318, errors: 0
+     1532 states, stored
+        1 states, matched
+     1533 transitions (= stored+matched)
+      255 atomic steps
+hash conflicts:         0 (resolved)
+...
+\end{lstlisting}
+\textbf{Tampoco hay exclusión mútua}
+
+\subsubsection{Tamaño de buffer 0}
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+...
+State-vector 52 byte, depth reached 5, errors: 0
+        3 states, stored
+        1 states, matched
+        4 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+...
+\end{lstlisting}
+\textbf{No hay ningún proceso que pase por sección crítica nunca, no hay exclusión mútua}
+
+\subsection{Deadlock}
+\subsubsection{Producer, Consumer $>=$ 1}
+
+\begin{lstlisting}
+spin -a producers_consumers.pml
+gcc -o pan pan.c 
+./pan
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+...
+State-vector 44 byte, depth reached 9999, errors: 0
+    19546 states, stored
+    30293 states, matched
+    49839 transitions (= stored+matched)
+     9917 atomic steps
+hash conflicts:       192 (resolved)
+...
+\end{lstlisting}
+\textbf{No hay deadlock}
+
+\subsubsection{Buffer N de tamaño 0}
+
+\begin{lstlisting}
+spin -a producers_consumers.pml
+gcc -o pan pan.c 
+./pan
+\end{lstlisting}
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+...
+State-vector 44 byte, depth reached 2, errors: 1
+        3 states, stored
+        0 states, matched
+        3 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+\end{lstlisting}
+\textbf{Como el tamaño del buffer es 0, ambos procesos se quedan esperando indefinidamente}
+\subsection{Starvation}
+
+Para la detección de \textit{starvation} fue usada la siguiente fórmula LTL: 
+
+\begin{lstlisting}
+spin -a -f '!<>(Producer@cs)' producers_consumers.pml
+gcc -o pan pan.c
+./pan -a
+\end{lstlisting}
+
+Dónde comprobamos que:
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+...
+State-vector 60 byte, depth reached 31, errors: 1
+       15 states, stored
+        0 states, matched
+       15 transitions (= stored+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+...
+\end{lstlisting}
+\textbf{Se incurre en Starvation, como podemos comprobar en la siguiente traza}
+
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+spin -t -p producers_consumers.pml
+
+starting claim 2
+spin: couldn't find claim 2 (ignored)
+using statement merging
+              Produce nuevo item
+  2:	proc  1 (Producer:1) producers_consumers.pml:12 (state 1)	[printf('Produce nuevo item\\n')]
+          Produce nuevo item
+  4:	proc  0 (Producer:1) producers_consumers.pml:12 (state 1)	[printf('Produce nuevo item\\n')]
+  <<<<<START OF CYCLE>>>>>
+  6:	proc  1 (Producer:1) producers_consumers.pml:15 (state 2)	[(holes)]
+  7:	proc  1 (Producer:1) producers_consumers.pml:16 (state 3)	[((items<255))]
+  7:	proc  1 (Producer:1) producers_consumers.pml:17 (state 4)	[holes = (holes-1)]
+  9:	proc  1 (Producer:1) producers_consumers.pml:21 (state 6)	[(!(mutex))]
+  9:	proc  1 (Producer:1) producers_consumers.pml:22 (state 7)	[mutex = 1]
+              Escribe en el buffer
+ 11:	proc  1 (Producer:1) producers_consumers.pml:24 (state 9)	[printf('Escribe en el buffer\\n')]
+ 13:	proc  1 (Producer:1) producers_consumers.pml:26 (state 10)	[mutex = 0]
+ 15:	proc  1 (Producer:1) producers_consumers.pml:28 (state 11)	[items = (items+1)]
+              Produce nuevo item
+ 17:	proc  1 (Producer:1) producers_consumers.pml:12 (state 1)	[printf('Produce nuevo item\\n')]
+ 19:	proc  3 (Consumer:1) producers_consumers.pml:38 (state 1)	[(items)]
+ 20:	proc  3 (Consumer:1) producers_consumers.pml:39 (state 2)	[((holes<255))]
+ 20:	proc  3 (Consumer:1) producers_consumers.pml:40 (state 3)	[items = (items-1)]
+ 22:	proc  3 (Consumer:1) producers_consumers.pml:44 (state 5)	[(!(mutex))]
+ 22:	proc  3 (Consumer:1) producers_consumers.pml:45 (state 6)	[mutex = 1]
+                      Extrae elemento del buffer
+ 24:	proc  3 (Consumer:1) producers_consumers.pml:47 (state 8)	[printf('Extrae elemento del buffer\\n')]
+ 26:	proc  3 (Consumer:1) producers_consumers.pml:49 (state 9)	[mutex = 0]
+ 28:	proc  3 (Consumer:1) producers_consumers.pml:51 (state 10)	[holes = (holes+1)]
+                      Consume elemento
+ 30:	proc  3 (Consumer:1) producers_consumers.pml:52 (state 11)	[printf('Consume elemento\\n')]
+spin: trail ends after 30 steps
+#processes: 4
+		holes = 255
+		items = 0
+		mutex = 0
+ 30:	proc  3 (Consumer:1) producers_consumers.pml:34 (state 12)
+ 30:	proc  2 (Consumer:1) producers_consumers.pml:34 (state 12)
+ 30:	proc  1 (Producer:1) producers_consumers.pml:14 (state 5)
+ 30:	proc  0 (Producer:1) producers_consumers.pml:14 (state 5)
+4 processes created
+\end{lstlisting}
+
+\textbf{Podemos comprobar que hay un ciclo, donde se reparten la ejecución el proceso 1 y 3 ; el proceso 0 y 2 permanecen en starvation}
+Podemos solucionar esto con una cola o un array de procesos, en el cual se entra cuando se solicita el mutex, y este se va dando en orden, para así ningún proceso caiga en starvation.
+
+\subsubsection{Un solo proceso, Productor}
+\begin{lstlisting}[frame=single]  % Start your code-block
+
+\end{lstlisting}
+
+State-vector 28 byte, depth reached 7, errors: 0
+        4 states, stored (8 visited)
+        2 states, matched
+       10 transitions (= visited+matched)
+        2 atomic steps
+hash conflicts:         0 (resolved)
+\end{lstlisting}
+\textbf{En este caso particular no hay starvation para Productor, Si que lo hay para el consumidor, porque no llega a ejecutarse nunca.}
+
+\subsubsection{Tamaño de Buffer 0}
+Hay starvation, ningún proceso entra nunca en zona crítica
 \end{document}          
