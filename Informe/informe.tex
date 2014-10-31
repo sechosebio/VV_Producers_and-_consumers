@@ -136,6 +136,41 @@ En caso de realizar la misma prueba con 1 \textit{consumer} y 0 \textit{producer
 
 Para tamaño de buffer=0 queda demostrado que no existe \textit{mutual exclusion} puesto que ningún proceso produce, ni consume nada, ya que no entran en zona crítica.
 
+En la siguiente traza:
+
+\begin{verbatim}
+
+...
+9984:	proc  3 (Consumer:1) producers_consumers.pml:24 (state 3)	
+[printf('%d Elementos en buffer\\n\\n',items)]
+9986:	proc  3 (Consumer:1) producers_consumers.pml:25 (state 4)	
+[items = (items-1)]
+9988:	proc  3 (Consumer:1) producers_consumers.pml:22 (state 1)	
+[((items>0))]
+9990:	proc  2 (Consumer:1) producers_consumers.pml:22 (state 1)	
+[((items>0))]
+              Produce nuevo elemento
+9992:	proc  1 (Producer:1) producers_consumers.pml:12 (state 2)	
+[printf('Produce nuevo elemento\\n')]
+                  Extraído elemento del buffer
+9994:	proc  2 (Consumer:1) producers_consumers.pml:23 (state 2)	
+[printf('Extraído elemento del buffer\\n')]
+9996:	proc  0 (Producer:1) producers_consumers.pml:11 (state 1)	
+[((items<255))]
+          Produce nuevo elemento
+9998:	proc  0 (Producer:1) producers_consumers.pml:12 (state 2)	
+[printf('Produce nuevo elemento\\n')]
+spin: trail ends after 9999 steps
+#processes: 4
+		items = 42
+9999:	proc  3 (Consumer:1) producers_consumers.pml:23 (state 2)
+9999:	proc  2 (Consumer:1) producers_consumers.pml:24 (state 3)
+9999:	proc  1 (Producer:1) producers_consumers.pml:13 (state 3)
+9999:	proc  0 (Producer:1) producers_consumers.pml:13 (state 3)
+4 processes created
+\end{verbatim}
+
+Podemos apreciar que hay más de un proceso en el estado 3, sección crítica
 \subsection{Deadlock}
 
 Para comprobar la existencia de \textit{deadlock}, usamos la  fórmula LTE mostrada a continuación:
@@ -146,48 +181,36 @@ gcc -o pan pan.c
 ./pan
 \end{lstlisting}
 
+\subsubsection{Consumer, Producer $>=$ 1}
 Obteniendo como salida de terminal.
 
 \begin{lstlisting}[frame=single]
-hint: this search is more efficient if pan.c is compiled
- -DSAFETY
-error: max search depth too small
-pan:1: assertion violated (items>0) (at depth 5473)
-pan: wrote producers_consumers.pml.trail
 
-(Spin Version 6.4.0 -- 19 September 2014)
-Warning: Search not completed
-	+ Partial Order Reduction
-
-Full statespace search for:
-	never claim         	- (none specified)
-	assertion violations	+
-	acceptance   cycles 	- (not selected)
-	invalid end states	+
-
-State-vector 36 byte, depth reached 9999, errors: 1
-    14562 states, stored
-    15564 states, matched
-    30126 transitions (= stored+matched)
+...
+State-vector 36 byte, depth reached 9785, errors: 0
+    14814 states, stored
+    17468 states, matched
+    32282 transitions (= stored+matched)
         0 atomic steps
-hash conflicts:      3970 (resolved)
-
-Stats on memory usage (in Megabytes):
-    0.889	equivalent memory usage for states 
-    (stored*(State-vector + overhead))
-    0.682	actual memory usage for states 
-    (compression: 76.72%)
-         	state-vector as stored = 21 byte + 28 byte
-         	 overhead
-  128.000	memory used for hash table (-w24)
-    0.534	memory used for DFS stack (-m10000)
-  129.120	total actual memory usage
-
-
-
-pan: elapsed time 0.02 seconds
-pan: rate    728100 states/second
+hash conflicts:      7237 (resolved)
+...
 \end{lstlisting}
+\textbf{No hay deadlock para Consumer, Producer $>=$ 1}
+
+\subsubsection{Buffer Tamaño 0}
+\begin{lstlisting}[frame=single]
+
+...
+State-vector 36 byte, depth reached 0, errors: 1
+        1 states, stored
+        0 states, matched
+        1 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+\end{lstlisting}
+
+\textbf{Productor y Consumidor quedan indefinidamente esperando porque el buffer deje
+de estar lleno y vacio}
 
 \subsection{Starvation}
 

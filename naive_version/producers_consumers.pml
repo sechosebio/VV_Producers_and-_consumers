@@ -16,7 +16,7 @@ active [2] proctype Producer(){
 	od;
 }
 
-active [1] proctype Consumer(){
+active [2] proctype Consumer(){
 	do
 	::	 
 		items > 0;
