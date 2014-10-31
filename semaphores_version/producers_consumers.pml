@@ -1,23 +1,27 @@
 /* In the second algorithm, we will use two general semaphores: items (counting
  * the items in the buffer) and holes(counting the remaining holes in the
  * buffer) plus a binary semaphore mutexfor accessing the critical section. */
-
-byte holes = 255;
+#define N 255
+byte holes = N;
 byte items = 0;
 bool mutex = false;
 
-active proctype Producer(){
+active [1] proctype Producer(){
 	do
 	::
 		printf("Produce nuevo item\n");
 		/* wait holes */
-		holes;
-		holes--;
+		atomic{
+			holes;
+			items<N;
+			holes--;
+		};
 		/* wait mutex */
-		!mutex;
-		mutex = true;
-		cs:printf("Escribe en el buffer, hay %i elementos\n");
-		holes--;
+		atomic{
+			!mutex;
+			mutex = true;
+		};
+		cs:printf("Escribe en el buffer\n");
 		/* signal mutex */
 		mutex = false;
 		/* signal items */
@@ -26,20 +30,25 @@ active proctype Producer(){
 	od;
 }
 
-active proctype Consumer(){
+active [0] proctype Consumer(){
 	do
 	::
 		/* lock items */
-		items;
-		items--;
+		atomic{
+			items;
+			holes<N;
+			items--;
+		};
 		/* lock mutex */
-		!mutex;
-		mutex = true;
-		cs:printf("Extrae elemento del buffer, quedan %i elementos\n");
+		atomic{
+			!mutex;
+			mutex = true;
+		};
+		cs:printf("Extrae elemento del buffer\n");
 		/* signal mutex */
 		mutex = false;
 		/*signal holes */
-		holes--;
+		holes++;
 		printf("Consume elemento\n");
 	od;
 }

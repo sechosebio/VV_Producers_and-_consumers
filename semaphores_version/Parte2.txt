@@ -1,0 +1,23 @@
+# DEADLOCK
+
+al principio habia deadlock, porque no controlabamos (no venia en el pseudocódigo) que items y holes tuvieran overflow
+ahora no hay deadlock, se puede comprobar con:
+
+spin -a producers_consumers.pml 
+gcc -o pan pan.c
+./pan 
+y comprobar que no tiene salida de error
+para Producer,Consumer >=1 
+
+con N = 0 si que hay deadlock, se quedan esperando indefinidamente ambos
+con N > 0 ya no
+
+# MUTUAL EXCLUSION
+
+spin -a -f '<>(Producer@cs^Consumer@cs)' producers_consumers.pml
+con la versión inicial, en Producer=Consumer=1 no hay mutual exclusion
+con un numero mayor a uno tampoco (pero tengo mis dudas con spin -a -f '<>(Producer[0]@cs^Consumer[1]@cs)' producers_consumers.pml
+da error
+
+
+# STARVATION
