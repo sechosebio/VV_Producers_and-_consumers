@@ -75,9 +75,61 @@ active [1] proctype Consumer(){
 \subsection{Mutual exclusion}
 Para probar la existencia de \textit{mutual exclusion} en el agoritmo \textit{naive}, utilizamos la siguiente fórmula LTL
 
-\begin{lstlisting}
-spin -a -f '<>(Consumer[0]@cs && Consumer[1]@cs)' 
+\begin{lstlisting}[frame=single]
+spin -a -f '<>(Consumer[0]@cs && Consumer[2]@cs)' 
 producers_consumers.pml
+gcc -o pan pan.c 
+./pan
+\end{lstlisting}
+
+\newpage
+
+Obteniendo como resultado la siguiente salida
+
+\begin{lstlisting}[frame=single]
+warning: never claim + accept labels requires -a flag 
+to fully verify
+hint: this search is more efficient if pan.c is compiled 
+-DSAFETY
+warning: for p.o. reduction to be valid the never claim
+ must be stutter-invariant
+(never claims generated from LTL formulae are 
+stutter-invariant)
+pan:1: assertion violated  
+!(((Consumer[0]._p==cs)&&(Consumer[2]._p==cs)))
+ (at depth 8896)
+pan: wrote producers_consumers.pml.trail
+
+(Spin Version 6.4.0 -- 19 September 2014)
+Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (never_0)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	- (not selected)
+	invalid end states	- (disabled by never claim)
+
+State-vector 44 byte, depth reached 8896, errors: 1
+     4450 states, stored
+     1903 states, matched
+     6353 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.306	equivalent memory usage for states
+     (stored*(State-vector + overhead))
+    0.388	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.827	total actual memory usage
+
+
+
+pan: elapsed time 0.02 seconds
+pan: rate    222500 states/second
+
 \end{lstlisting}
 
 En caso de realizar la misma prueba con 1 \textit{consumer} y 0 \textit{producer}, o viceversa, no existe \textit{mutual exclusion} ya que sólo hay un proceso corriendo al mismo tiempo.
@@ -86,23 +138,108 @@ Para tamaño de buffer=0 queda demostrado que no existe \textit{mutual exclusion
 
 \subsection{Deadlock}
 
-\begin{lstlisting}
+Para comprobar la existencia de \textit{deadlock}, usamos la  fórmula LTE mostrada a continuación:
+
+\begin{lstlisting}[frame=single]
 spin -a producers_consumers.pml
 gcc -o pan pan.c 
 ./pan
+\end{lstlisting}
+
+Obteniendo como salida de terminal.
+
+\begin{lstlisting}[frame=single]
+hint: this search is more efficient if pan.c is compiled
+ -DSAFETY
+error: max search depth too small
+pan:1: assertion violated (items>0) (at depth 5473)
+pan: wrote producers_consumers.pml.trail
+
+(Spin Version 6.4.0 -- 19 September 2014)
+Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	- (none specified)
+	assertion violations	+
+	acceptance   cycles 	- (not selected)
+	invalid end states	+
+
+State-vector 36 byte, depth reached 9999, errors: 1
+    14562 states, stored
+    15564 states, matched
+    30126 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:      3970 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.889	equivalent memory usage for states 
+    (stored*(State-vector + overhead))
+    0.682	actual memory usage for states 
+    (compression: 76.72%)
+         	state-vector as stored = 21 byte + 28 byte
+         	 overhead
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  129.120	total actual memory usage
+
+
+
+pan: elapsed time 0.02 seconds
+pan: rate    728100 states/second
 \end{lstlisting}
 
 \subsection{Starvation}
 
 Para la detección de \textit{starvation} fue usada la siguiente fórmula LTE: 
 
-\begin{lstlisting}
+\begin{lstlisting}[frame=single]
 spin -a -f '![]<>(Producer@cs
 )' producers_consumers.pml
 gcc -o pan pan.c
 ./pan -a
 \end{lstlisting}
+ 
+Que tiene como salida:
 
+\begin{lstlisting}[frame=single]
+warning: for p.o. reduction to be valid the never 
+claim must be stutter-invariant
+(never claims generated from LTL formulae are 
+stutter-invariant)
+pan:1: acceptance cycle (at depth 2)
+pan: wrote producers_consumers.pml.trail
+
+(Spin Version 6.4.0 -- 19 September 2014)
+Warning: Search not completed
+	+ Partial Order Reduction
+
+Full statespace search for:
+	never claim         	+ (never_0)
+	assertion violations	+ (if within scope of claim)
+	acceptance   cycles 	+ (fairness disabled)
+	invalid end states	- (disabled by never claim)
+
+State-vector 44 byte, depth reached 19, errors: 1
+       10 states, stored
+        0 states, matched
+       10 transitions (= stored+matched)
+        0 atomic steps
+hash conflicts:         0 (resolved)
+
+Stats on memory usage (in Megabytes):
+    0.001	equivalent memory usage for states 
+    (stored*(State-vector + overhead))
+    0.290	actual memory usage for states
+  128.000	memory used for hash table (-w24)
+    0.534	memory used for DFS stack (-m10000)
+  128.730	total actual memory usage
+
+
+
+pan: elapsed time 0 seconds
+
+\end{lstlisting}
 Dónde comprobamos que:
 
 \begin{itemize}
@@ -110,5 +247,8 @@ Dónde comprobamos que:
 \item \textit{producer}=\textit{consumer}=1 no encuentra, puesto que se turnan para producir/consumir.
 \item \textit{producer}\textgreater 1 o \textit{consumer}\textgreater 1 sí hay \textit{starvation}.
 \end{itemize}
+
+
+\section{Semaphores}
 
 \end{document}          
